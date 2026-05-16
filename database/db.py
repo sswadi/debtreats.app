@@ -68,3 +68,4 @@ def seed_db():
     )
     conn.commit()
     conn.close()
+
