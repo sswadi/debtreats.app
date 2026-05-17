@@ -29,7 +29,7 @@ def landing():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if session.get("user_id"):
-        return redirect(url_for("landing"))
+        return redirect(url_for("profile"))
     if request.method == "GET":
         return render_template("register.html")
 
@@ -59,13 +59,13 @@ def register():
     session["user_id"]   = cursor.lastrowid
     session["user_name"] = name
     flash(f"Welcome, {name}! Your account has been created.", "success")
-    return redirect(url_for("landing"))
+    return redirect(url_for("profile"))
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("user_id"):
-        return redirect(url_for("landing"))
+        return redirect(url_for("profile"))
     if request.method == "GET":
         return render_template("login.html")
 
@@ -82,7 +82,7 @@ def login():
     session["user_id"]   = user["id"]
     session["user_name"] = user["name"]
     flash(f"Welcome back, {user['name']}!", "success")
-    return redirect(url_for("landing"))
+    return redirect(url_for("profile"))
 
 
 # ------------------------------------------------------------------ #
@@ -107,8 +107,34 @@ def logout():
 
 
 @app.route("/profile")
+@login_required
 def profile():
-    return "Profile page — coming in Step 4"
+    user = {
+        "name": "Alex Mercer",
+        "email": "alex@example.com",
+        "member_since": "January 2024",
+        "initials": "AM",
+    }
+    stats = {
+        "total_spent": "$1,284.50",
+        "transaction_count": 24,
+        "top_category": "Food & Drink",
+    }
+    transactions = [
+        {"date": "May 14, 2026", "description": "Whole Foods Market",   "category": "Food & Drink",  "badge_class": "badge-food",          "amount": "$87.32"},
+        {"date": "May 10, 2026", "description": "Uber ride",            "category": "Transport",     "badge_class": "badge-transport",     "amount": "$14.50"},
+        {"date": "May 8, 2026",  "description": "Netflix subscription", "category": "Entertainment", "badge_class": "badge-entertainment", "amount": "$15.99"},
+        {"date": "May 5, 2026",  "description": "Electric bill",        "category": "Bills",         "badge_class": "badge-bills",         "amount": "$112.00"},
+        {"date": "May 2, 2026",  "description": "Trader Joe's",         "category": "Food & Drink",  "badge_class": "badge-food",          "amount": "$63.45"},
+    ]
+    categories = [
+        {"name": "Food & Drink",  "amount": "$432.80", "bar_class": "bar-food bar-w-34"},
+        {"name": "Bills",         "amount": "$312.00", "bar_class": "bar-bills bar-w-24"},
+        {"name": "Transport",     "amount": "$198.50", "bar_class": "bar-transport bar-w-15"},
+        {"name": "Entertainment", "amount": "$156.20", "bar_class": "bar-entertainment bar-w-12"},
+    ]
+    return render_template("profile.html", user=user, stats=stats,
+                           transactions=transactions, categories=categories)
 
 
 @app.route("/expenses/add")
